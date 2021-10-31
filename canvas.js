@@ -9,8 +9,8 @@ document.body.appendChild( renderer.domElement );
 const controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 // Background texture
-const loader = new THREE.TextureLoader();
-const texture = loader.load( 'img/mountain.jpg',
+const TextureLoader = new THREE.TextureLoader();
+const texture = TextureLoader.load( 'img/sky1K.jpg',
     () => {
         const rt = new THREE.WebGLCubeRenderTarget( texture.image.height );
         rt.fromEquirectangularTexture( renderer, texture );
@@ -20,31 +20,49 @@ const texture = loader.load( 'img/mountain.jpg',
 // Sunshine
 const light = new THREE.DirectionalLight( 0xFFFFFF );
 light.castShadow = true;
-light.position.set(7, 2, 0);
+light.position.set(7, 6, 0);
 const helper = new THREE.DirectionalLightHelper( light, 5 );
 scene.add( helper );
 scene.add( light );
 
 // Ground
-const ground_geometry = new THREE.PlaneGeometry( 120, 120 );
-const ground_material = new THREE.MeshStandardMaterial({
-    map: new THREE.TextureLoader().load( 'img/grass.jpg' )
+const floor_geometry = new THREE.PlaneGeometry( 100, 100 );
+const floor_material = new THREE.MeshLambertMaterial({
+    map: new THREE.TextureLoader().load( 'img/asphalt.jpg' )
 });
-const ground = new THREE.Mesh( ground_geometry, ground_material );
-ground.lookAt(0, 1, 0)
+floor_material.map.wrapS = THREE.RepeatWrapping;
+floor_material.map.wrapT = THREE.RepeatWrapping;
+floor_material.map.repeat.set(20, 20);
+const floor = new THREE.Mesh( floor_geometry, floor_material );
+floor.rotation.x = -Math.PI / 2
 // ground.castShadow = true;
-ground.receiveShadow = true;
-scene.add( ground )
+floor.receiveShadow = true;
+scene.add( floor );
 
+// Kart
+// const GLTFLoader = new GLTFLoader();
+/*GLTFLoader.load(
+    'models/kart.blend',
+    function ( gltf ) {
+        //scene.add( gltf.scene );
+    },
+    function ( xhr ) {
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    },
+    function ( error ) {
+        console.log( 'An error happened' );
+    }
+);
+*/
 // Box
 const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
+const material = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
 const cube = new THREE.Mesh( geometry, material );
 cube.castShadow = true;
-cube.position.y = 2
+cube.position.y = 2;
 scene.add( cube );
 
-// controls.update()
+// controls.update();
 camera.position.z = 5;
 
 const animate = function () {
