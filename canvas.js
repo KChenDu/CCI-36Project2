@@ -40,20 +40,20 @@ floor.receiveShadow = true;
 scene.add( floor );
 
 // Kart
-// const GLTFLoader = new GLTFLoader();
-/*GLTFLoader.load(
-    'models/kart.blend',
-    function ( gltf ) {
-        //scene.add( gltf.scene );
-    },
-    function ( xhr ) {
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    },
-    function ( error ) {
-        console.log( 'An error happened' );
-    }
-);
-*/
+const GLTFLoader = new THREE.GLTFLoader();
+GLTFLoader.load( 'models/kart.glb', function ( gltf ) {
+    gltf.scene.position.y = 5;
+    gltf.scene.traverse( function( child ) {
+        if ( child.isMesh ) {
+            child.castShadow = true;
+        }
+    } );
+        gltf.scene.castShadow = true;
+    scene.add( gltf.scene );
+    }, undefined, function ( error ) {
+    console.error( error );
+} );
+
 // Box
 const geometry = new THREE.BoxGeometry();
 const material = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );

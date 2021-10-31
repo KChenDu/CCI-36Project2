@@ -1,0 +1,11 @@
+{
+  "name": "proj2",
+  "version": "1.0.0",
+  "devDependencies": {
+    "three": "^0.134.0"
+  },
+  "dependencies": {
+    "three-gltf-loader": "^1.111.0",
+    "three-orbitcontrols": "^2.110.3"
+  }
+}
