@@ -25,7 +25,7 @@ const helper = new THREE.DirectionalLightHelper( light, 5 );
 scene.add( helper );
 scene.add( light );
 
-// Ground
+// Floor
 const floor_geometry = new THREE.PlaneGeometry( 100, 100 );
 const floor_material = new THREE.MeshLambertMaterial({
     map: new THREE.TextureLoader().load( 'img/asphalt.jpg' )
@@ -43,35 +43,60 @@ scene.add( floor );
 const GLTFLoader = new THREE.GLTFLoader();
 GLTFLoader.load( 'models/kart.glb', function ( gltf ) {
     gltf.scene.position.y = 5;
-    gltf.scene.traverse( function( child ) {
-        if ( child.isMesh ) {
-            child.castShadow = true;
-        }
+    gltf.scene.children[3].material = new THREE.MeshStandardMaterial( {
+        color: 0xff0000
     } );
-        gltf.scene.castShadow = true;
+    gltf.scene.children[7].material = new THREE.MeshPhongMaterial( {
+        color: 0x111111
+    } );//7 8 12
+    gltf.scene.children[17].material = new THREE.MeshStandardMaterial( {
+        color: 0xaaaaaa
+    } );
+    gltf.scene.children[18].material = new THREE.MeshStandardMaterial( {
+        color: 0xaaaaaa
+    } );
+    gltf.scene.children[20].material = new THREE.MeshStandardMaterial( {
+        color: 0xaaaaaa
+    } );
+    gltf.scene.children[24].material = new THREE.MeshStandardMaterial( {
+        color: 0xff0000
+    } );
+    gltf.scene.traverse( function( child ) {
+        child.castShadow = true;
+    } );
     scene.add( gltf.scene );
     }, undefined, function ( error ) {
     console.error( error );
 } );
 
-// Box
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
-const cube = new THREE.Mesh( geometry, material );
-cube.castShadow = true;
-cube.position.y = 2;
-scene.add( cube );
+const cubeCamera = new THREE.CubeCamera(1, 1000, 50);
+cubeCamera.position.y = 2;
+scene.add(cubeCamera);
+
+// const sphereMaterial = new THREE.MeshBasicMaterial();
+const sphereMaterial = new THREE.MeshBasicMaterial( { envMap: cubeCamera.renderTarget } );
+const sphereGeo =  new THREE.SphereGeometry();
+const mirrorSphere = new THREE.Mesh(sphereGeo, sphereMaterial);
+mirrorSphere.position.set(0, 2, 0);
+scene.add(mirrorSphere);
+
+// Punctual light
+const p = new THREE.PointLight( 0xFFFFFF );
+scene.add( p );
 
 // controls.update();
-camera.position.z = 5;
+camera.position.y = 15;
+camera.lookAt(0, 0, 0);
 
 const animate = function () {
     requestAnimationFrame( animate );
 
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
-
     renderer.render( scene, camera );
+
+    mirrorSphere.visible=false;
+    cubeCamera.position.copy(mirrorSphere.position);
+    cubeCamera.updateCubeMap(renderer, scene);
+    mirrorSphere.visible = true;
 };
 
 animate();
