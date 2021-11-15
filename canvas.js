@@ -41,42 +41,13 @@ scene.add( floor );
 const GLTFLoader = new THREE.GLTFLoader();
 GLTFLoader.load( 'models/kart.glb', function ( gltf ) {
     gltf.scene.position.y = 5;
-    gltf.scene.children[3].material = new THREE.MeshStandardMaterial( {
-        color: 0xff0000
-    } );
-    gltf.scene.children[7].material = new THREE.MeshPhongMaterial( {
-        color: 0x111111
-    } );//7 8 12
-    gltf.scene.children[17].material = new THREE.MeshStandardMaterial( {
-        color: 0xaaaaaa
-    } );
-    gltf.scene.children[18].material = new THREE.MeshStandardMaterial( {
-        color: 0xaaaaaa
-    } );
-    gltf.scene.children[20].material = new THREE.MeshStandardMaterial( {
-        color: 0xaaaaaa
-    } );
-    gltf.scene.children[24].material = new THREE.MeshStandardMaterial( {
-        color: 0xff0000
-    } );
-    gltf.scene.children[25].material = new THREE.MeshStandardMaterial( {
-        color: 0xff0000
-    } );
-    gltf.scene.children[26].material = new THREE.MeshStandardMaterial( {
-        color: 0xff0000
-    } );
-    gltf.scene.children[28].material = new THREE.MeshStandardMaterial( {
-        color: 0xff0000
-    } );
     let i = 0;
     gltf.scene.traverse( function( child ) {
         if( child.isMesh ) {
             console.log(i);
             child.castShadow = true;
-            child.material = new THREE.MeshPhysicalMaterial( {
-                color: 0xffffff,
-                // roughness: 0.5,
-                envMap: texture,
+            child.material = new THREE.MeshLambertMaterial( {
+                // fill color
             } );
         }
         i++;
@@ -86,7 +57,7 @@ GLTFLoader.load( 'models/kart.glb', function ( gltf ) {
     console.error( error );
 } );
 
-//#####################################################
+//##################################################### TEST ZONE dont remove
 
 const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
 const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
@@ -107,10 +78,10 @@ camera.lookAt(0, 0, 0);
 
 const animate = function () {
     requestAnimationFrame( animate );
-///////////////////////////////////////
+    //########################## TEST ZONE dont remove
     cubeCamera.position.copy( sphere.position );
     cubeCamera.update( renderer, scene );
-    /////////////////////////////
+    //##########################
     renderer.render( scene, camera );
 };
 
