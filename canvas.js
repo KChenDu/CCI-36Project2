@@ -1,10 +1,11 @@
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const camera = new THREE.PerspectiveCamera( 75,
+    window.innerWidth / window.innerHeight, 0.1, 1000 );
 
 // Basic elements
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
-renderer.shadowMapEnabled = true;
+renderer.shadowMap.enabled = true;
 document.body.appendChild( renderer.domElement );
 const controls = new THREE.OrbitControls( camera, renderer.domElement );
 
@@ -25,14 +26,20 @@ scene.add( helper );
 scene.add( light );
 
 // Floor
-const floor_geometry = new THREE.PlaneGeometry( 1000, 1000 );
-const floor_material = new THREE.MeshLambertMaterial({
+const floorLength = 1000;
+const floorResolutionFactor = 4e-2;
+const floorTextureRepetitions = floorLength * floorResolutionFactor;
+
+const floorGeometry = new THREE.PlaneGeometry( floorLength, floorLength );
+const floorMaterial = new THREE.MeshLambertMaterial({
     map: new THREE.TextureLoader().load( 'img/asphalt.jpg' )
 });
-floor_material.map.wrapS = THREE.RepeatWrapping;
-floor_material.map.wrapT = THREE.RepeatWrapping;
-floor_material.map.repeat.set( 200, 200 );
-const floor = new THREE.Mesh( floor_geometry, floor_material );
+const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
+floorMaterial.map.anisotropy = maxAnisotropy;
+floorMaterial.map.wrapS = THREE.RepeatWrapping;
+floorMaterial.map.wrapT = THREE.RepeatWrapping;
+floorMaterial.map.repeat.set(floorTextureRepetitions, floorTextureRepetitions);
+const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 floor.rotation.x = -Math.PI / 2
 floor.receiveShadow = true;
 scene.add( floor );
