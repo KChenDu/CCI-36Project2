@@ -5,6 +5,7 @@
     "three": "^0.134.0"
   },
   "dependencies": {
+    "package.json": "^2.0.1",
     "three-gltf-loader": "^1.111.0",
     "three-orbitcontrols": "^2.110.3"
   }

@@ -9,8 +9,7 @@ document.body.appendChild( renderer.domElement );
 const controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 // Background texture
-const TextureLoader = new THREE.TextureLoader();
-const texture = TextureLoader.load( 'img/sky1K.jpg',
+const texture = new THREE.TextureLoader().load( 'img/sky1K.jpg',
     () => {
         const rt = new THREE.WebGLCubeRenderTarget( texture.image.height );
         rt.fromEquirectangularTexture( renderer, texture );
@@ -26,16 +25,15 @@ scene.add( helper );
 scene.add( light );
 
 // Floor
-const floor_geometry = new THREE.PlaneGeometry( 100000, 100000 );
+const floor_geometry = new THREE.PlaneGeometry( 1000, 1000 );
 const floor_material = new THREE.MeshLambertMaterial({
     map: new THREE.TextureLoader().load( 'img/asphalt.jpg' )
 });
 floor_material.map.wrapS = THREE.RepeatWrapping;
 floor_material.map.wrapT = THREE.RepeatWrapping;
-floor_material.map.repeat.set(200, 200);
+floor_material.map.repeat.set( 200, 200 );
 const floor = new THREE.Mesh( floor_geometry, floor_material );
 floor.rotation.x = -Math.PI / 2
-// ground.castShadow = true;
 floor.receiveShadow = true;
 scene.add( floor );
 
@@ -70,12 +68,18 @@ GLTFLoader.load( 'models/kart.glb', function ( gltf ) {
     gltf.scene.children[28].material = new THREE.MeshStandardMaterial( {
         color: 0xff0000
     } );
+    let i = 0;
     gltf.scene.traverse( function( child ) {
-        child.castShadow = true;
-        // child.material = new THREE.MeshStandardMaterial( {
-        //     color: 0x0000ff
-        //
-        // } );
+        if( child.isMesh ) {
+            console.log(i);
+            child.castShadow = true;
+            child.material = new THREE.MeshPhysicalMaterial( {
+                color: 0xffffff,
+                // roughness: 0.5,
+                envMap: texture,
+            } );
+        }
+        i++;
     } );
     scene.add( gltf.scene );
     }, undefined, function ( error ) {
@@ -83,29 +87,30 @@ GLTFLoader.load( 'models/kart.glb', function ( gltf ) {
 } );
 
 //#####################################################
-/*
-sphereCamera = new THREE.CubeCamera(1,1000,500);
-sphereCamera.position.set(0,100,0);
-scene.add(sphereCamera);
 
-let sphereMaterial = new THREE.MeshBasicMaterial({
-    envMap: sphereCamera.renderTarget
+const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
+scene.add( cubeCamera );
+
+const geometry = new THREE.SphereGeometry(2, 100, 50);
+const material = new THREE.MeshLambertMaterial({
+    envMap: cubeCamera.renderTarget.texture
 });
-let sphereGeo = new THREE.SphereGeometry(350,50,50);
-let sphere = new THREE.Mesh(sphereGeo,sphereMaterial);
-sphere.position.set(0,100,0);
-scene.add(sphere);
-*/
+const sphere = new THREE.Mesh( geometry, material );
+sphere.position.y = 2;
+scene.add( sphere );
+
 //########################################################33
 
-// controls.update();
 camera.position.y = 15;
 camera.lookAt(0, 0, 0);
 
 const animate = function () {
     requestAnimationFrame( animate );
-
-    // sphereCamera.updateCubeMap(renderer,scene);
+///////////////////////////////////////
+    cubeCamera.position.copy( sphere.position );
+    cubeCamera.update( renderer, scene );
+    /////////////////////////////
     renderer.render( scene, camera );
 };
 
