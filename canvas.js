@@ -8,6 +8,8 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.shadowMap.enabled = true;
 document.body.appendChild( renderer.domElement );
 const controls = new THREE.OrbitControls( camera, renderer.domElement );
+const axeshelp = new THREE.AxesHelper(5);
+scene.add(axeshelp)
 
 // Background texture
 const texture = new THREE.TextureLoader().load( 'img/sky1K.jpg',
@@ -63,6 +65,27 @@ GLTFLoader.load( 'models/kart.glb', function ( gltf ) {
     }, undefined, function ( error ) {
     console.error( error );
 } );
+
+// Track - quero mobius
+
+const track = new THREE.CurvePath() // Curve paths are an array of curves
+const numOfCurves = 1;
+//let curveStart = 
+for(var i = 0; i < numOfCurves; i++) {
+    const curve = new THREE.CubicBezierCurve3(
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(-5, 15, 0),
+        new THREE.Vector3(20, 15, 0),
+        new THREE.Vector3(10, 0, 0)
+    )
+    track.add(curve);
+}
+const trackGeometry = new THREE.BufferGeometry().setFromPoints(
+    track.getPoints()
+);
+const trackMaterial = new THREE.LineBasicMaterial({color: 0xff0000});
+const trackObject = new THREE.Line(trackGeometry, trackMaterial);
+scene.add(trackObject)
 
 //##################################################### TEST ZONE dont remove
 
