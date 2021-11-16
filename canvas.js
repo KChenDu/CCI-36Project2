@@ -48,12 +48,13 @@ scene.add( floor );
 
 // Kart
 const GLTFLoader = new THREE.GLTFLoader();
+let kart;
 GLTFLoader.load( 'models/kart.glb', function ( gltf ) {
-    gltf.scene.position.y = 5;
+    //gltf.scene.position.y = 5;
     let i = 0;
     gltf.scene.traverse( function( child ) {
         if( child.isMesh ) {
-            console.log(i);
+            //console.log(i);
             child.castShadow = true;
             child.material = new THREE.MeshLambertMaterial( {
                 // fill color
@@ -61,10 +62,35 @@ GLTFLoader.load( 'models/kart.glb', function ( gltf ) {
         }
         i++;
     } );
+    kart = gltf.scene;
     scene.add( gltf.scene );
     }, undefined, function ( error ) {
     console.error( error );
 } );
+
+// Keyboard Controls
+document.addEventListener('keydown', (e) => {
+    //console.log(e.key)
+    switch(e.key) {
+        case '1':
+            scene.add(camera);
+            camera.position.set(50,50,50);
+            camera.lookAt(0,0,0);
+            break;
+        case '2':
+            kart.add(camera);
+            camera.position.set(0,3,0);
+            camera.setRotationFromAxisAngle(new THREE.Vector3( 0, 1, 0), Math.PI);
+            break;
+        case '3':
+            kart.add(camera);
+            camera.position.set(0,8,-20);
+            camera.setRotationFromAxisAngle(new THREE.Vector3( 0, 1, 0), Math.PI);
+            break;
+        default:
+    }
+})
+
 
 // Track - quero mobius
 
