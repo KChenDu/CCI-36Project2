@@ -44,7 +44,7 @@ floorMaterial.map.repeat.set(floorTextureRepetitions, floorTextureRepetitions);
 const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 floor.rotation.x = -Math.PI / 2
 floor.receiveShadow = true;
-scene.add( floor );
+// scene.add( floor );
 
 // Kart
 const GLTFLoader = new THREE.GLTFLoader();
@@ -65,6 +65,20 @@ GLTFLoader.load( 'models/kart.glb', function ( gltf ) {
     kart = gltf.scene;
     scene.add( gltf.scene );
     }, undefined, function ( error ) {
+    console.error( error );
+} );
+
+GLTFLoader.load( 'models/track.glb', function ( gltf ) {
+    gltf.scene.traverse( function( child ) {
+        if( child.isMesh ) {
+            child.castShadow = true;
+            child.material = new THREE.MeshBasicMaterial( {
+                color: 0xff00ff
+            } );
+        }
+    } );
+    scene.add( gltf.scene );
+}, undefined, function ( error ) {
     console.error( error );
 } );
 
