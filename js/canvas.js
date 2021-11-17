@@ -1,5 +1,6 @@
 import { trackGeometry, middleLineGeometry,
-  trackGetPoint, trackGetNormal, trackGetTangent 
+  trackGetPoint, trackGetNormal, trackGetTangent,
+  leftCurve
 } from "./track.js";
 
 
@@ -194,11 +195,17 @@ const trackObject = new THREE.Mesh(trackGeometry, trackMaterial);
 
 // Middle white line
 const middleLineMaterial = new THREE.LineBasicMaterial(
-  {color: 0xffffff, linewidth: 6}
+  {color: 0xffffff, linewidth: 2}
 );
-const middleLineObject = new THREE.Line(middleLineGeometry, middleLineMaterial);
+const upMiddleLineObject = new THREE.Line(middleLineGeometry,
+  middleLineMaterial);
+const downMiddleLineObject = new THREE.Line(middleLineGeometry, 
+  middleLineMaterial);
+upMiddleLineObject.position.y += 0.04
+downMiddleLineObject.position.y -= 0.04
 
-trackObject.add(middleLineObject);
+trackObject.add(upMiddleLineObject);
+trackObject.add(downMiddleLineObject);
 
 trackObject.position.y += 10;
 scene.add(trackObject);
@@ -248,11 +255,14 @@ const normal = new THREE.Vector3();
 const tangent = new THREE.Vector3();
 const cross = new THREE.Vector3();
 const matrix = new THREE.Matrix4();
+const trackLenght = leftCurve.getLength()
+
+const velocityFactor = 1/2;
 
 const animate = function () {
   if(kart){
     
-    progress += 1/400
+    progress += velocityFactor/trackLenght
     progress %= 1
     
     position.copy(trackGetPoint(progress));

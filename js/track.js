@@ -5,8 +5,8 @@ const PI2 = 2 * Math.PI;
 * Track Parameters - CHANGE THE PATH HERE *
 ******************************************/
 
-const width = 10;
-const nCtrlPoints = 10;
+const width = 5;
+const nCtrlPoints = 70;
 const curveResolution = 1000;
 
 // Control points definition
@@ -14,31 +14,14 @@ const controlPoints = []
 const controlAngles = []
 
 function getPathPoints(p) {
-  return new THREE.Vector3().setFromCylindricalCoords(50, PI2*p, 40*p);
+  return new THREE.Vector3().setFromCylindricalCoords(50, 2*PI2*p, 40*p);
 }
 
 for(let i=0; i<nCtrlPoints; i+=1) {
   const u = i/nCtrlPoints;
 
   controlPoints.push(getPathPoints(u))
-  controlAngles.push(i*4*Math.PI/nCtrlPoints)
-}
-
-// Parametric Functions
-export function trackGetPoint(p) {
-  return leftCurve.getPointAt(p).clone()
-    .add(rightCurve.getPointAt(p))
-    .divideScalar(2);
-}
-
-export function trackGetNormal(p) {
-  const tangent = middleCurve.getTangentAt(p);
-  const cross = leftCurve.getPointAt(p).clone().sub(rightCurve.getPointAt(p))
-  return tangent.cross(cross).normalize()
-}
-
-export function trackGetTangent(p) {
-  return middleCurve.getTangentAt(p).normalize();
+  controlAngles.push(i*9*Math.PI/nCtrlPoints)
 }
 
 // By here, the track is defined.
@@ -66,7 +49,7 @@ for(let i=0; i<nCtrlPoints; i+=1) {
   correctedUpVec.crossVectors(THREE.Object3D.DefaultUp, tanVec)
     .normalize().cross(tanVec).negate();
   
-  normalVec.copy(correctedUpVec).applyAxisAngle(tanVec, controlAngles[i])
+  normalVec.copy(correctedUpVec).applyAxisAngle(tanVec, -controlAngles[i])
   tiltedVec.crossVectors(normalVec, tanVec)
 
   const centerPoint = controlPoints[i];
@@ -79,8 +62,29 @@ for(let i=0; i<nCtrlPoints; i+=1) {
   rightCtrlPoints.push(rightPoint)
 }
 
-const leftCurve = new THREE.CatmullRomCurve3(leftCtrlPoints);
-const rightCurve = new THREE.CatmullRomCurve3(rightCtrlPoints);
+export const leftCurve = new THREE.CatmullRomCurve3(leftCtrlPoints);
+export const rightCurve = new THREE.CatmullRomCurve3(rightCtrlPoints);
+
+
+/**************************
+* Get component functions *
+**************************/
+
+export function trackGetPoint(p) {
+  return leftCurve.getPointAt(p).clone()
+    .add(rightCurve.getPointAt(p))
+    .divideScalar(2);
+}
+
+export function trackGetNormal(p) {
+  const tangent = middleCurve.getTangentAt(p);
+  const cross = leftCurve.getPointAt(p).clone().sub(rightCurve.getPointAt(p))
+  return tangent.cross(cross).normalize()
+}
+
+export function trackGetTangent(p) {
+  return middleCurve.getTangentAt(p).normalize();
+}
 
 
 /**************************************
