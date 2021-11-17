@@ -1,8 +1,6 @@
 {
   "name": "proj2",
   "version": "1.0.0",
-  "devDependencies": {
-  },
   "dependencies": {
     "package.json": "^2.0.1",
     "three": "^0.134.0",
