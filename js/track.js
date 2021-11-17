@@ -6,7 +6,7 @@ const PI2 = 2 * Math.PI;
 ******************************************/
 
 const width = 5;
-const nCtrlPoints = 70;
+const nCtrlPoints = 300;
 const curveResolution = 1000;
 
 // Control points definition
@@ -14,14 +14,26 @@ const controlPoints = []
 const controlAngles = []
 
 function getPathPoints(p) {
-  return new THREE.Vector3().setFromCylindricalCoords(50, 2*PI2*p, 40*p);
+  p = p * PI2;
+
+  const x = Math.sin( p * 3 ) * Math.cos( p * 4 ) * 50;
+  const y = Math.sin( p * 10 ) * 6 + Math.cos( p * 33/2 ) * 2 + 10;
+  const z = Math.sin( p ) * Math.sin( p * 4 ) * 50;
+
+  return new THREE.Vector3().set( x, y, z ).multiplyScalar( 2 );
+  //return new THREE.Vector3().setFromCylindricalCoords(50, 2*PI2*p, 40*p);
+}
+
+function getPathAngles(p) {
+  return Math.sin(p*40) * PI2/6;
+  return 0;
 }
 
 for(let i=0; i<nCtrlPoints; i+=1) {
   const u = i/nCtrlPoints;
 
   controlPoints.push(getPathPoints(u))
-  controlAngles.push(i*9*Math.PI/nCtrlPoints)
+  controlAngles.push(getPathAngles(u))
 }
 
 // By here, the track is defined.
@@ -71,19 +83,26 @@ export const rightCurve = new THREE.CatmullRomCurve3(rightCtrlPoints);
 **************************/
 
 export function trackGetPoint(p) {
-  return leftCurve.getPointAt(p).clone()
-    .add(rightCurve.getPointAt(p))
+  // return leftCurve.getPointAt(p).clone()
+  //   .add(rightCurve.getPointAt(p))
+  //   .divideScalar(2);
+  return leftCurve.getPoint(p).clone()
+    .add(rightCurve.getPoint(p))
     .divideScalar(2);
 }
 
 export function trackGetNormal(p) {
-  const tangent = middleCurve.getTangentAt(p);
-  const cross = leftCurve.getPointAt(p).clone().sub(rightCurve.getPointAt(p))
+  // const tangent = middleCurve.getTangentAt(p);
+  // const cross = leftCurve.getPointAt(p).clone().sub(rightCurve.getPointAt(p))
+  // return tangent.cross(cross).normalize()
+  const tangent = middleCurve.getTangent(p);
+  const cross = leftCurve.getPoint(p).clone().sub(rightCurve.getPoint(p))
   return tangent.cross(cross).normalize()
 }
 
 export function trackGetTangent(p) {
-  return middleCurve.getTangentAt(p).normalize();
+  // return middleCurve.getTangentAt(p).normalize();
+  return middleCurve.getTangent(p).normalize();
 }
 
 
@@ -94,8 +113,10 @@ export function trackGetTangent(p) {
 const vertices = [];
 const normals = [];
 
-const leftSpacedPoints = leftCurve.getSpacedPoints(curveResolution)
-const rightSpacedPoints = rightCurve.getSpacedPoints(curveResolution)
+// const leftSpacedPoints = leftCurve.getSpacedPoints(curveResolution)
+// const rightSpacedPoints = rightCurve.getSpacedPoints(curveResolution)
+const leftSpacedPoints = leftCurve.getPoints(curveResolution)
+const rightSpacedPoints = rightCurve.getPoints(curveResolution)
 
 for(let i = 0; i < curveResolution-1; i++) {
   const point1 = leftSpacedPoints[i]
@@ -136,8 +157,10 @@ export const trackGeometry = new THREE.BufferGeometry()
 
 export const middleLineGeometry = new THREE.BufferGeometry().setFromPoints(
   (()=>{
-    const arrLeft = leftCurve.getSpacedPoints(curveResolution);
-    const arrRight = rightCurve.getSpacedPoints(curveResolution);
+    // const arrLeft = leftCurve.getSpacedPoints(curveResolution);
+    // const arrRight = rightCurve.getSpacedPoints(curveResolution);
+    const arrLeft = leftCurve.getPoints(curveResolution);
+    const arrRight = rightCurve.getPoints(curveResolution);
     const arrCenter = arrLeft.map((lv, i)=>(
       lv.clone().add(arrRight[i]).divideScalar(2)
     ))

@@ -132,7 +132,7 @@ document.addEventListener('keydown', (e) => {
   switch(e.key) {
     case '1':
       scene.add(camera);
-      camera.position.set(70, 70, 70);
+      camera.position.set(1, 1, 1).multiplyScalar(90);
       // camera.position.set(150, 350, 200);
       camera.lookAt(0, 0, 0);
       break;
@@ -291,5 +291,5 @@ renderer.setAnimationLoop(animate);
 * Initial camera *
 *****************/
 
-camera.position.set(70, 70, 70);
+camera.position.set(1, 1, 1).multiplyScalar(90);
 camera.lookAt(0, 0, 0);
