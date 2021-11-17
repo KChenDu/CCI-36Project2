@@ -1,8 +1,11 @@
-import { trackGeometry, trackGetNormalAt, trackGetPointAt } from "./track.js";
+import { trackGeometry, middleLineGeometry,
+  trackGetPoint, trackGetNormal, trackGetTangent 
+} from "./track.js";
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75,
-    window.innerWidth / window.innerHeight, 0.1, 1000 );
+  window.innerWidth / window.innerHeight, 0.1, 1000
+);
 
 // Basic elements
 const renderer = new THREE.WebGLRenderer();
@@ -14,12 +17,11 @@ const axeshelp = new THREE.AxesHelper(5);
 scene.add(axeshelp)
 
 // Background texture
-const texture = new THREE.TextureLoader().load( 'img/sky1K.jpg',
-    () => {
-        const rt = new THREE.WebGLCubeRenderTarget( texture.image.height );
-        rt.fromEquirectangularTexture( renderer, texture );
-        scene.background = rt.texture;
-    });
+const texture = new THREE.TextureLoader().load( 'img/sky1K.jpg', () => {
+  const rt = new THREE.WebGLCubeRenderTarget( texture.image.height );
+  rt.fromEquirectangularTexture( renderer, texture );
+  scene.background = rt.texture;
+});
 
 // Sunshine
 const light = new THREE.DirectionalLight( 0xFFFFFF );
@@ -36,7 +38,7 @@ const floorTextureRepetitions = floorLength * floorResolutionFactor;
 
 const floorGeometry = new THREE.PlaneGeometry( floorLength, floorLength );
 const floorMaterial = new THREE.MeshLambertMaterial({
-    map: new THREE.TextureLoader().load( 'img/asphalt.jpg' )
+  map: new THREE.TextureLoader().load( 'img/asphalt.jpg' )
 });
 const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
 floorMaterial.map.anisotropy = maxAnisotropy;
@@ -51,143 +53,100 @@ scene.add( floor );
 // Kart
 const GLTFLoader = new THREE.GLTFLoader();
 let kart;
-GLTFLoader.load( 'models/kart.glb', function ( gltf ) {
+GLTFLoader.load('models/kart.glb',
+  function ( gltf ) {
     //gltf.scene.position.y = 5;
     let i = 0;
     gltf.scene.traverse( function( child ) {
-        if( child.isMesh ) {
-            //console.log(i);
-            child.castShadow = true;
-            child.material = new THREE.MeshLambertMaterial( {
-                // fill color
-            } );
-        }
-        i++;
+      if( child.isMesh ) {
+        //console.log(i);
+        child.castShadow = true;
+        child.material = new THREE.MeshLambertMaterial({
+            // fill color
+        });
+      }
+      i++;
     } );
     kart = gltf.scene;
-    scene.add( gltf.scene );
-    }, undefined, function ( error ) {
-    console.error( error );
-} );
-
-// GLTFLoader.load( 'models/track.glb', function ( gltf ) {
-//     gltf.scene.traverse( function( child ) {
-//         if( child.isMesh ) {
-//             child.castShadow = true;
-//             child.material = new THREE.MeshBasicMaterial( {
-//                 color: 0xff00ff
-//             } );
-//         }
-//     } );
-//     scene.add( gltf.scene );
-// }, undefined, function ( error ) {
-//     console.error( error );
-// } );
+    trackObject.add( gltf.scene );
+  }, 
+  undefined, 
+  function ( error ) {onsole.error( error );}
+);
 
 // Keyboard Controls
 document.addEventListener('keydown', (e) => {
-    //console.log(e.key)
-    switch(e.key) {
-        case '1':
-            scene.add(camera);
-            camera.position.set(50,50,50);
-            camera.lookAt(0,0,0);
-            break;
-        case '2':
-            kart.add(camera);
-            camera.position.set(0,3,0);
-            camera.setRotationFromAxisAngle(new THREE.Vector3( 0, 1, 0), Math.PI);
-            break;
-        case '3':
-            kart.add(camera);
-            camera.position.set(0,8,-20);
-            camera.setRotationFromAxisAngle(new THREE.Vector3( 0, 1, 0), Math.PI);
-            break;
-        default:
-    }
+  switch(e.key) {
+    case '1':
+      scene.add(camera);
+      camera.position.set(70, 70, 70);
+      camera.lookAt(0, 0, 0);
+      break;
+    case '2':
+      kart.add(camera);
+      camera.position.set(0,3,0);
+      camera.setRotationFromAxisAngle(new THREE.Vector3( 0, 1, 0), Math.PI);
+      break;
+    case '3':
+      kart.add(camera);
+      camera.position.set(0,8,-20);
+      camera.setRotationFromAxisAngle(new THREE.Vector3( 0, 1, 0), Math.PI);
+      break;
+    default:
+  }
 })
 
-
-// Track - quero mobius
-
-//const track = new THREE.CurvePath() // Curve paths are an array of curves
-//const numOfCurves = 1;
-//let curveStart =
-// const numOfPoints = 100;
-// const pointArray = [];
-
-// const radius = 50;
-// const circleCenter = new THREE.Vector3(radius, 0, 0);
-
-// const PI2 = 2*Math.PI;
-// const deltaAng = PI2 / numOfPoints;
-
-// for(var ang = 0; ang < PI2; ang += deltaAng) {
-//     const point = new THREE.Vector3();
-    
-//     point.set(-radius*Math.cos(ang), 0, radius*Math.sin(ang))
-//     point.add(circleCenter)
-    
-//     pointArray.push(point)
-// }
-
-// const curve = new THREE.CatmullRomCurve3(pointArray)
-// const trackGeometry = new THREE.BufferGeometry().setFromPoints(
-//     curve.getPoints(200)
-// );
-
-const trackMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
+// Track
+const trackMaterial = new THREE.MeshLambertMaterial(
+  {color: 0xff0000, side: THREE.DoubleSide}
+);
 const trackObject = new THREE.Mesh(trackGeometry, trackMaterial);
-scene.add(trackObject)
 
-//##################################################### TEST ZONE dont remove
+const middleLineMaterial = new THREE.LineBasicMaterial(
+  {color: 0xffffff, linewidth: 6}
+);
+const middleLineObject = new THREE.Line(middleLineGeometry, middleLineMaterial);
 
-// const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
-// const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
-// scene.add( cubeCamera );
+trackObject.add(middleLineObject);
 
-// const geometry = new THREE.SphereGeometry(2, 100, 50);
-// const material = new THREE.MeshLambertMaterial({
-//     envMap: cubeCamera.renderTarget.texture
-// });
-// const sphere = new THREE.Mesh( geometry, material );
-// sphere.position.y = 2;
-// scene.add( sphere );
+trackObject.position.y += 10;
+scene.add(trackObject);
 
-//########################################################33
-
-camera.position.set(-80, 105, -40);
-camera.lookAt(70, 50, 0);
+// Animation
 
 let progress = 0;
 const position = new THREE.Vector3();
 const normal = new THREE.Vector3();
 const tangent = new THREE.Vector3();
-
-const up = new THREE.Vector3(0,1,0);
+const cross = new THREE.Vector3();
+const matrix = new THREE.Matrix4();
 
 const animate = function () {
-    if(kart){
-    //requestAnimationFrame( animate );
-    //########################## TEST ZONE dont remove
-    // cubeCamera.position.copy( sphere.position );
-    // cubeCamera.update( renderer, scene );
-    //##########################
-    progress += 1/800
+  if(kart){
+    
+    progress += 1/400
     progress %= 1
     
-    position.copy(trackGetPointAt(progress));
-    normal.copy(trackGetNormalAt(progress).normalize());
-    position.addScaledVector(normal, 1)
-    tangent.crossVectors(normal, up);
+    position.copy(trackGetPoint(progress));
+    normal.copy(trackGetNormal(progress));
+    tangent.copy(trackGetTangent(progress));
+    cross.crossVectors(normal, tangent).normalize();
+
+    matrix.set(
+      cross.x, normal.x, tangent.x, 0,
+      cross.y, normal.y, tangent.y, 0,
+      cross.z, normal.z, tangent.z, 0,
+      0, 0, 0, 1
+    )
 
     kart.position.copy(position)
-    // kart.setRotationFromEuler(
-    //     new THREE.Euler()
-    // );
-
+    kart.setRotationFromMatrix(matrix)
+    
     renderer.render( scene, camera );
-    }
+  }
 };
 
 renderer.setAnimationLoop(animate);
+
+camera.position.set(70, 70, 70);
+camera.lookAt(0, 0, 0);
