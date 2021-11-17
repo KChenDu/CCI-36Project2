@@ -1,3 +1,5 @@
+import { trackGeometry, trackGetNormalAt, trackGetPointAt } from "./track.js";
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75,
     window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -44,7 +46,7 @@ floorMaterial.map.repeat.set(floorTextureRepetitions, floorTextureRepetitions);
 const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 floor.rotation.x = -Math.PI / 2
 floor.receiveShadow = true;
-// scene.add( floor );
+scene.add( floor );
 
 // Kart
 const GLTFLoader = new THREE.GLTFLoader();
@@ -68,19 +70,19 @@ GLTFLoader.load( 'models/kart.glb', function ( gltf ) {
     console.error( error );
 } );
 
-GLTFLoader.load( 'models/track.glb', function ( gltf ) {
-    gltf.scene.traverse( function( child ) {
-        if( child.isMesh ) {
-            child.castShadow = true;
-            child.material = new THREE.MeshBasicMaterial( {
-                color: 0xff00ff
-            } );
-        }
-    } );
-    scene.add( gltf.scene );
-}, undefined, function ( error ) {
-    console.error( error );
-} );
+// GLTFLoader.load( 'models/track.glb', function ( gltf ) {
+//     gltf.scene.traverse( function( child ) {
+//         if( child.isMesh ) {
+//             child.castShadow = true;
+//             child.material = new THREE.MeshBasicMaterial( {
+//                 color: 0xff00ff
+//             } );
+//         }
+//     } );
+//     scene.add( gltf.scene );
+// }, undefined, function ( error ) {
+//     console.error( error );
+// } );
 
 // Keyboard Controls
 document.addEventListener('keydown', (e) => {
@@ -108,51 +110,84 @@ document.addEventListener('keydown', (e) => {
 
 // Track - quero mobius
 
-const track = new THREE.CurvePath() // Curve paths are an array of curves
-const numOfCurves = 1;
-//let curveStart = 
-for(var i = 0; i < numOfCurves; i++) {
-    const curve = new THREE.CubicBezierCurve3(
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(-5, 15, 0),
-        new THREE.Vector3(20, 15, 0),
-        new THREE.Vector3(10, 0, 0)
-    )
-    track.add(curve);
-}
-const trackGeometry = new THREE.BufferGeometry().setFromPoints(
-    track.getPoints()
-);
-const trackMaterial = new THREE.LineBasicMaterial({color: 0xff0000});
-const trackObject = new THREE.Line(trackGeometry, trackMaterial);
+//const track = new THREE.CurvePath() // Curve paths are an array of curves
+//const numOfCurves = 1;
+//let curveStart =
+// const numOfPoints = 100;
+// const pointArray = [];
+
+// const radius = 50;
+// const circleCenter = new THREE.Vector3(radius, 0, 0);
+
+// const PI2 = 2*Math.PI;
+// const deltaAng = PI2 / numOfPoints;
+
+// for(var ang = 0; ang < PI2; ang += deltaAng) {
+//     const point = new THREE.Vector3();
+    
+//     point.set(-radius*Math.cos(ang), 0, radius*Math.sin(ang))
+//     point.add(circleCenter)
+    
+//     pointArray.push(point)
+// }
+
+// const curve = new THREE.CatmullRomCurve3(pointArray)
+// const trackGeometry = new THREE.BufferGeometry().setFromPoints(
+//     curve.getPoints(200)
+// );
+
+const trackMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
+const trackObject = new THREE.Mesh(trackGeometry, trackMaterial);
 scene.add(trackObject)
 
 //##################################################### TEST ZONE dont remove
 
-const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
-const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
-scene.add( cubeCamera );
+// const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+// const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
+// scene.add( cubeCamera );
 
-const geometry = new THREE.SphereGeometry(2, 100, 50);
-const material = new THREE.MeshLambertMaterial({
-    envMap: cubeCamera.renderTarget.texture
-});
-const sphere = new THREE.Mesh( geometry, material );
-sphere.position.y = 2;
-scene.add( sphere );
+// const geometry = new THREE.SphereGeometry(2, 100, 50);
+// const material = new THREE.MeshLambertMaterial({
+//     envMap: cubeCamera.renderTarget.texture
+// });
+// const sphere = new THREE.Mesh( geometry, material );
+// sphere.position.y = 2;
+// scene.add( sphere );
 
 //########################################################33
 
-camera.position.y = 15;
-camera.lookAt(0, 0, 0);
+camera.position.set(-80, 105, -40);
+camera.lookAt(70, 50, 0);
+
+let progress = 0;
+const position = new THREE.Vector3();
+const normal = new THREE.Vector3();
+const tangent = new THREE.Vector3();
+
+const up = new THREE.Vector3(0,1,0);
 
 const animate = function () {
-    requestAnimationFrame( animate );
+    if(kart){
+    //requestAnimationFrame( animate );
     //########################## TEST ZONE dont remove
-    cubeCamera.position.copy( sphere.position );
-    cubeCamera.update( renderer, scene );
+    // cubeCamera.position.copy( sphere.position );
+    // cubeCamera.update( renderer, scene );
     //##########################
+    progress += 1/800
+    progress %= 1
+    
+    position.copy(trackGetPointAt(progress));
+    normal.copy(trackGetNormalAt(progress).normalize());
+    position.addScaledVector(normal, 1)
+    tangent.crossVectors(normal, up);
+
+    kart.position.copy(position)
+    // kart.setRotationFromEuler(
+    //     new THREE.Euler()
+    // );
+
     renderer.render( scene, camera );
+    }
 };
 
-animate();
+renderer.setAnimationLoop(animate);
