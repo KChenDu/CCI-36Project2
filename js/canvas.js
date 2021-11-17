@@ -37,11 +37,12 @@ const texture = new THREE.TextureLoader().load( '../img/sky1K.jpg', () => {
 // Sunshine
 const light = new THREE.DirectionalLight( 0xFFFFFF );
 light.castShadow = true;
-light.position.set(7, 6, 0);
+// light.position.set(70, 60, 0);
+light.position.set(0, 200, 0);
 scene.add( light );
 // helper
-// const helper = new THREE.DirectionalLightHelper( light, 5 );
-// scene.add( helper );
+const helper = new THREE.DirectionalLightHelper( light, 5 );
+scene.add( helper );
 
 // Floor
 const floorLength = 1000;
@@ -76,20 +77,21 @@ GLTFLoader.load('../models/kart.glb',
     //gltf.scene.position.y = 5;
     let i = 0;
     gltf.scene.traverse( function( child ) {
+      child.castShadow = true;
       if( child.isMesh ) {
         //console.log(i);
-        child.castShadow = true;
-        child.material = new THREE.MeshLambertMaterial({
-          // fill color
-        });
+        //child.material = new THREE.MeshLambertMaterial({
+        //  // fill color
+        //});
       }
       i++;
     } );
     kart = gltf.scene;
     trackObject.add( gltf.scene );
-  }, 
+    // scene.add( gltf.scene );
+  },
   undefined, 
-  function ( error ) {onsole.error( error );}
+  function ( error ) { console.error( error ); }
 );
 
 /*
@@ -206,47 +208,16 @@ downMiddleLineObject.position.y -= 0.04
 
 trackObject.add(upMiddleLineObject);
 trackObject.add(downMiddleLineObject);
+trackObject.position.y += 20;
 
-trackObject.position.y += 10;
+trackObject.castShadow = true;
+trackObject.receiveShadow = true;
+
 scene.add(trackObject);
-
 
 /************
 * Animation *
 ************/
-
-/*
-// Chen
-
-let i = 1;
-
-const animate = function () {
-  requestAnimationFrame( animate );
-  //########################## TEST ZONE dont remove
-  // kart.children[1].position.set(3,3,3);
-  // updateKart(i);
-  kart.position.copy( points[i] );
-  cube.position.copy( points[i] );
-  cube.position.y += 3;
-  cube.lookAt( points[i + 1].x - points[i - 1].x,
-               points[i + 1].y - points[i - 1].y,
-               points[i + 1].z - points[i - 1].z );
-  kart.rotation.y += 0.1;
-  // cube.rotation.x += 0.1;
-  // cube.rotation.z += 0.1;
-  cubeCamera.position.copy( cube.position );
-  cubeCamera.update( renderer, scene );
-  // camera.position.copy( sphere.position );
-  //##########################
-  renderer.render( scene, camera );
-  if ( i < 9999 )
-    ++i;
-  else
-    i = 1;
-}
-
-animate()
-*/
 
 // Macedo
 let progress = 0;
@@ -255,14 +226,14 @@ const normal = new THREE.Vector3();
 const tangent = new THREE.Vector3();
 const cross = new THREE.Vector3();
 const matrix = new THREE.Matrix4();
-const trackLenght = leftCurve.getLength()
+const trackLength = leftCurve.getLength()
 
 const velocityFactor = 1/2;
 
 const animate = function () {
   if(kart){
     
-    progress += velocityFactor/trackLenght
+    progress += velocityFactor/trackLength
     progress %= 1
     
     position.copy(trackGetPoint(progress));
@@ -279,7 +250,9 @@ const animate = function () {
 
     kart.position.copy(position)
     kart.setRotationFromMatrix(matrix)
-    
+    // kart.position.set(0,1,0)
+    //kart.lookAt(0,0,1)
+
     renderer.render( scene, camera );
   }
 };
@@ -291,5 +264,5 @@ renderer.setAnimationLoop(animate);
 * Initial camera *
 *****************/
 
-camera.position.set(1, 1, 1).multiplyScalar(90);
+camera.position.set(1, 1, 1).multiplyScalar(3);
 camera.lookAt(0, 0, 0);
