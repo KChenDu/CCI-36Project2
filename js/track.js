@@ -17,7 +17,7 @@ function getPathPoints(p) {
   p = p * PI2;
 
   const x = Math.sin( p * 3 ) * Math.cos( p * 4 ) * 50;
-  const y = Math.sin( p * 10 ) * 6 + Math.cos( p * 33/2 ) * 2 + 10;
+  const y = Math.sin( p * 10 ) * 6 + Math.cos( p * 33/2 ) * 2;
   const z = Math.sin( p ) * Math.sin( p * 4 ) * 50;
 
   return new THREE.Vector3().set( x, y, z ).multiplyScalar( 2 );
