@@ -136,10 +136,22 @@ for(let i = 0; i < curveResolution-1; i++) {
   vertices.push( point1.x, point1.y, point1.z );
   vertices.push( point4.x, point4.y, point4.z );
   vertices.push( point3.x, point3.y, point3.z );
-
+  
   for(let i = 0; i < 6; i++) { 
     normals.push( normal.x, normal.y, normal.z );
   }
+  
+  // vertices.push( point1.x, point1.y, point1.z );
+  // vertices.push( point4.x, point4.y, point4.z );
+  // vertices.push( point2.x, point2.y, point2.z );
+
+  // vertices.push( point1.x, point1.y, point1.z );
+  // vertices.push( point3.x, point3.y, point3.z );
+  // vertices.push( point4.x, point4.y, point4.z );
+
+  // for(let i = 0; i < 6; i++) { 
+  //   normals.push( -normal.x, -normal.y, -normal.z );
+  // }
 }
 
 

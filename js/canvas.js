@@ -36,9 +36,20 @@ const texture = new THREE.TextureLoader().load( '../img/sky1K.jpg', () => {
 
 // Sunshine
 const light = new THREE.DirectionalLight( 0xFFFFFF );
+
+light.position.set(0.7, 0.6, 0).multiplyScalar(100);
+
 light.castShadow = true;
-light.position.set(7, 6, 0);
+light.shadow.mapSize.width = 8192;
+light.shadow.mapSize.height = 8192;
+light.shadow.bias = -0.001
+light.shadow.camera.zoom = 0.01;
+light.shadow.radius = 1
+//light.shadow.camera.position.set(0,100,0)
+//light.shadow.camera.position.set(0,100,0)
+//console.log(light.shadow.getFrustum())
 scene.add( light );
+//scene.add( light.target )
 // helper
 // const helper = new THREE.DirectionalLightHelper( light, 5 );
 // scene.add( helper );
@@ -50,7 +61,8 @@ const floorTextureRepetitions = floorLength * floorResolutionFactor;
 
 const floorGeometry = new THREE.PlaneGeometry( floorLength, floorLength );
 const floorMaterial = new THREE.MeshLambertMaterial({
-  map: new THREE.TextureLoader().load( '../img/asphalt.jpg' )
+  map: new THREE.TextureLoader().load( '../img/asphalt.jpg' ),
+  //shadowSide: THREE.DoubleSide
 });
 const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
 floorMaterial.map.anisotropy = maxAnisotropy;
@@ -189,9 +201,11 @@ scene.add( cube );
 // Macedo
 // Track
 const trackMaterial = new THREE.MeshLambertMaterial(
-  {color: 0xff0000, side: THREE.DoubleSide}
+  {color: 0xff0000, side: THREE.DoubleSide, shadowSide: THREE.FrontSide}
 );
 const trackObject = new THREE.Mesh(trackGeometry, trackMaterial);
+trackObject.castShadow = true;
+trackObject.receiveShadow = true;
 
 // Middle white line
 const middleLineMaterial = new THREE.LineBasicMaterial(
