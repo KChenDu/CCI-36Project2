@@ -51,8 +51,8 @@ light.shadow.radius = 1
 scene.add( light );
 //scene.add( light.target )
 // helper
-const helper = new THREE.DirectionalLightHelper( light, 5 );
-scene.add( helper );
+// const helper = new THREE.DirectionalLightHelper( light, 5 );
+// scene.add( helper );
 
 // Floor
 const floorLength = 1000;
@@ -60,7 +60,11 @@ const floorResolutionFactor = 4e-2;
 const floorTextureRepetitions = floorLength * floorResolutionFactor;
 
 const floorGeometry = new THREE.PlaneGeometry( floorLength, floorLength );
-const floorMaterial = new THREE.MeshLambertMaterial({
+// const floorMaterial = new THREE.MeshLambertMaterial({
+//   map: new THREE.TextureLoader().load( '../img/asphalt.jpg' ),
+//   //shadowSide: THREE.DoubleSide
+// });
+const floorMaterial = new THREE.MeshStandardMaterial({
   map: new THREE.TextureLoader().load( 'js/img/asphalt.jpg' ),
   //shadowSide: THREE.DoubleSide
 });
@@ -144,8 +148,11 @@ document.addEventListener('keydown', (e) => {
 
 // Macedo
 // Track
-const trackMaterial = new THREE.MeshLambertMaterial(
-  {color: 0xff0000, side: THREE.DoubleSide, shadowSide: THREE.FrontSide}
+// const trackMaterial = new THREE.MeshLambertMaterial(
+//   {color: 0xff0000}//, side: THREE.DoubleSide, shadowSide: THREE.FrontSide}
+// );
+const trackMaterial = new THREE.MeshStandardMaterial(
+  {color: 0xff0000}//, side: THREE.DoubleSide, shadowSide: THREE.FrontSide}
 );
 const trackObject = new THREE.Mesh(trackGeometry, trackMaterial);
 trackObject.castShadow = true;
@@ -155,19 +162,11 @@ trackObject.receiveShadow = true;
 const middleLineMaterial = new THREE.LineBasicMaterial(
   {color: 0xffffff, linewidth: 2}
 );
-const upMiddleLineObject = new THREE.Line(middleLineGeometry,
+const middleLineObject = new THREE.Line(middleLineGeometry,
   middleLineMaterial);
-const downMiddleLineObject = new THREE.Line(middleLineGeometry, 
-  middleLineMaterial);
-upMiddleLineObject.position.y += 0.04
-downMiddleLineObject.position.y -= 0.04
+trackObject.add(middleLineObject);
 
-trackObject.add(upMiddleLineObject);
-trackObject.add(downMiddleLineObject);
 trackObject.position.y += 20;
-
-trackObject.castShadow = true;
-trackObject.receiveShadow = true;
 
 scene.add(trackObject);
 

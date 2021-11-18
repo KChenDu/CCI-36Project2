@@ -6,8 +6,11 @@ const PI2 = 2 * Math.PI;
 ******************************************/
 
 const width = 5;
+const thickness = 0.5;
+const middleLineOffset = 0.05;
 const nCtrlPoints = 300;
-const curveResolution = 1000;
+const curveResolution = 2000;
+const gordurinha = 0.1;
 
 // Control points definition
 const controlPoints = []
@@ -112,6 +115,7 @@ export function trackGetTangent(p) {
 
 const vertices = [];
 const normals = [];
+const middleLinePoints = [];
 
 // const leftSpacedPoints = leftCurve.getSpacedPoints(curveResolution)
 // const rightSpacedPoints = rightCurve.getSpacedPoints(curveResolution)
@@ -124,11 +128,26 @@ for(let i = 0; i < curveResolution-1; i++) {
   const point3 = leftSpacedPoints[i+1]
   const point4 = rightSpacedPoints[i+1]
 
+  const tangent = point3.clone().sub(point1).normalize();
+  const cross = point1.clone().sub(point2).normalize();
   const normal = new THREE.Vector3().crossVectors(
-    point2.clone().sub(point1),
-    point3.clone().sub(point1)
-  ).normalize()
+    tangent,
+    cross
+  ).normalize();
+  
+  const point1down = point1.clone().addScaledVector(normal, -thickness)
+    .addScaledVector(tangent, -gordurinha)
+  const point2down = point2.clone().addScaledVector(normal, -thickness)
+    .addScaledVector(tangent, -gordurinha)
+  const point3down = point3.clone().addScaledVector(normal, -thickness)
+    .addScaledVector(tangent, gordurinha)
+  const point4down = point4.clone().addScaledVector(normal, -thickness)
+    .addScaledVector(tangent, gordurinha)
 
+  middleLinePoints.push( point1.clone().add(point2).divideScalar(2)
+    .addScaledVector(normal, middleLineOffset) )
+
+  // Up face
   vertices.push( point1.x, point1.y, point1.z );
   vertices.push( point2.x, point2.y, point2.z );
   vertices.push( point4.x, point4.y, point4.z );
@@ -140,18 +159,45 @@ for(let i = 0; i < curveResolution-1; i++) {
   for(let i = 0; i < 6; i++) { 
     normals.push( normal.x, normal.y, normal.z );
   }
+
+  // Down face
+  vertices.push( point1down.x, point1down.y, point1down.z );
+  vertices.push( point4down.x, point4down.y, point4down.z );
+  vertices.push( point2down.x, point2down.y, point2down.z );
+
+  vertices.push( point1down.x, point1down.y, point1down.z );
+  vertices.push( point3down.x, point3down.y, point3down.z );
+  vertices.push( point4down.x, point4down.y, point4down.z );
   
-  // vertices.push( point1.x, point1.y, point1.z );
-  // vertices.push( point4.x, point4.y, point4.z );
-  // vertices.push( point2.x, point2.y, point2.z );
+  for(let i = 0; i < 6; i++) { 
+    normals.push( -normal.x, -normal.y, -normal.z );
+  }
+  
+  // Left face
+  vertices.push( point1.x, point1.y, point1.z );
+  vertices.push( point3down.x, point3down.y, point3down.z );
+  vertices.push( point1down.x, point1down.y, point1down.z );
+  
+  vertices.push( point1.x, point1.y, point1.z );
+  vertices.push( point3.x, point3.y, point3.z );
+  vertices.push( point3down.x, point3down.y, point3down.z );
+  
+  for(let i = 0; i < 6; i++) { 
+    normals.push( cross.x, cross.y, cross.z );
+  }
 
-  // vertices.push( point1.x, point1.y, point1.z );
-  // vertices.push( point3.x, point3.y, point3.z );
-  // vertices.push( point4.x, point4.y, point4.z );
-
-  // for(let i = 0; i < 6; i++) { 
-  //   normals.push( -normal.x, -normal.y, -normal.z );
-  // }
+  // Right face
+  vertices.push( point2.x, point2.y, point2.z );
+  vertices.push( point4down.x, point4down.y, point4down.z );
+  vertices.push( point4.x, point4.y, point4.z );
+  
+  vertices.push( point2.x, point2.y, point2.z );
+  vertices.push( point2down.x, point2down.y, point2down.z );
+  vertices.push( point4down.x, point4down.y, point4down.z );
+  
+  for(let i = 0; i < 6; i++) { 
+    normals.push( -cross.x, -cross.y, -cross.z );
+  }
 }
 
 
@@ -168,16 +214,18 @@ export const trackGeometry = new THREE.BufferGeometry()
   ))
 
 export const middleLineGeometry = new THREE.BufferGeometry().setFromPoints(
-  (()=>{
-    // const arrLeft = leftCurve.getSpacedPoints(curveResolution);
-    // const arrRight = rightCurve.getSpacedPoints(curveResolution);
-    const arrLeft = leftCurve.getPoints(curveResolution);
-    const arrRight = rightCurve.getPoints(curveResolution);
-    const arrCenter = arrLeft.map((lv, i)=>(
-      lv.clone().add(arrRight[i]).divideScalar(2)
-    ))
-    return arrCenter
-  })()
+  middleLinePoints
+  // (()=>{
+  //   // const arrLeft = leftCurve.getSpacedPoints(curveResolution);
+  //   // const arrRight = rightCurve.getSpacedPoints(curveResolution);
+  //   const arrLeft = leftCurve.getPoints(curveResolution);
+  //   const arrRight = rightCurve.getPoints(curveResolution);
+  //   const arrCenter = arrLeft.map((lv, i)=>(
+  //     lv.clone().add(arrRight[i]).divideScalar(2)
+  //       .addScaledVector(), middleLineOffset)
+  //   ))
+  //   return arrCenter
+  // })()
 );
 
 /*
