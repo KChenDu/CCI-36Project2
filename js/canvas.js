@@ -37,8 +37,8 @@ const texture = new THREE.TextureLoader().load( '../img/sky1K.jpg', () => {
 // Sunshine
 const light = new THREE.DirectionalLight( 0xFFFFFF );
 light.castShadow = true;
-// light.position.set(70, 60, 0);
-light.position.set(0, 200, 0);
+light.position.set(70, 60, 0);
+// light.position.set(0, 200, 0);
 scene.add( light );
 // helper
 const helper = new THREE.DirectionalLightHelper( light, 5 );
@@ -74,17 +74,22 @@ const GLTFLoader = new THREE.GLTFLoader();
 // Kart
 GLTFLoader.load('../models/kart.glb',
   function ( gltf ) {
-    //gltf.scene.position.y = 5;
-    let i = 0;
+    gltf.scene.children[8].material = new THREE.MeshLambertMaterial( {
+      envMap: cubeCamera.renderTarget.texture
+    } );
+    gltf.scene.children[9].material = new THREE.MeshLambertMaterial( {
+      envMap: cubeCamera.renderTarget.texture
+    } );
+    gltf.scene.children[13].material = new THREE.MeshLambertMaterial( {
+      envMap: cubeCamera.renderTarget.texture
+    } );
+    gltf.scene.children[26].material = new THREE.MeshLambertMaterial( {
+      envMap: cubeCamera.renderTarget.texture
+    } );
     gltf.scene.traverse( function( child ) {
-      child.castShadow = true;
       if( child.isMesh ) {
-        //console.log(i);
-        //child.material = new THREE.MeshLambertMaterial({
-        //  // fill color
-        //});
+        child.castShadow = true;
       }
-      i++;
     } );
     kart = gltf.scene;
     trackObject.add( gltf.scene );
@@ -93,37 +98,6 @@ GLTFLoader.load('../models/kart.glb',
   undefined, 
   function ( error ) { console.error( error ); }
 );
-
-/*
-// Cup
-GLTFLoader.load( '../models/cup.glb',
-  function ( gltf ) {
-    let c = 0;
-    // gltf.scene.position.set(points[i].x, points[i].y, points[i].z);
-    // gltf.scene.lookAt( points[i + 1].x - points[i - 1].x,
-    //   points[i + 1].y - points[i - 1].y,
-    //   points[i + 1].z - points[i - 1].z );
-    gltf.scene.traverse( function( child ) {
-      // group.add( child );
-      if( child.isMesh ) {
-        console.log(c);
-        child.castShadow = true;
-        // child.receiveShadow = true;
-        // child.material = new THREE.MeshLambertMaterial( {
-        //   fill color
-        // } );
-      }
-      c++;
-    } );
-    kart = gltf.scene;
-    // kart.add( sphere );
-    scene.add( gltf.scene );
-  },
-  undefined,
-  function ( error ) {console.error( error );}
-);
-*/
-// kart.children[1].position.set(3, 3, 3);
 
 
 /********************
@@ -156,37 +130,6 @@ document.addEventListener('keydown', (e) => {
 /********
 * Track *
 ********/
-
-/*
-// Chen
-// Track
-const curve = new THREE.CatmullRomCurve3( [
-  new THREE.Vector3( 0, 300, 30 ),
-  new THREE.Vector3( 50, 30, 0 ),
-  new THREE.Vector3( 80, 70, 70 ),
-  new THREE.Vector3( 150, 40, -30 ),
-  new THREE.Vector3( 190, 150, 0 ),
-  new THREE.Vector3( 250, 250, 0 ),
-  new THREE.Vector3( 300, 20, 0 ),
-  new THREE.Vector3( 380, 0, 0 )
-] );
-
-const points = curve.getPoints( 10000 );
-const trackGeometry = new THREE.BufferGeometry().setFromPoints( points );
-const trackMaterial = new THREE.LineBasicMaterial( { color : 0xffffff } );
-const track = new THREE.Line( trackGeometry, trackMaterial );
-scene.add( track );
-
-// Metal cube
-const cubeGeometry = new THREE.SphereGeometry();
-const cubeMaterial = new THREE.MeshLambertMaterial( {
-  envMap: cubeCamera.renderTarget.texture
-} );
-const cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
-cube.castShadow = true;
-cube.position.y = 2;
-scene.add( cube );
-*/
 
 // Macedo
 // Track
@@ -250,9 +193,10 @@ const animate = function () {
 
     kart.position.copy(position)
     kart.setRotationFromMatrix(matrix)
-    // kart.position.set(0,1,0)
-    //kart.lookAt(0,0,1)
-
+    // kart.position.set(0,0,0);
+    //kart.lookAt(0,0,1);
+    cubeCamera.position.copy( kart.position );
+    cubeCamera.update( renderer, scene );
     renderer.render( scene, camera );
   }
 };
@@ -264,5 +208,5 @@ renderer.setAnimationLoop(animate);
 * Initial camera *
 *****************/
 
-camera.position.set(1, 1, 1).multiplyScalar(3);
-camera.lookAt(0, 0, 0);
+camera.position.set(2, 20, 2).multiplyScalar(2);
+camera.lookAt(0, 20, 0);
