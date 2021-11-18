@@ -28,7 +28,7 @@ const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
 scene.add( cubeCamera );
 
 // Background texture
-const texture = new THREE.TextureLoader().load( '../img/sky1K.jpg', () => {
+const texture = new THREE.TextureLoader().load( 'js/img/sky1K.jpg', () => {
   const rt = new THREE.WebGLCubeRenderTarget( texture.image.height );
   rt.fromEquirectangularTexture( renderer, texture );
   scene.background = rt.texture;
@@ -61,7 +61,7 @@ const floorTextureRepetitions = floorLength * floorResolutionFactor;
 
 const floorGeometry = new THREE.PlaneGeometry( floorLength, floorLength );
 const floorMaterial = new THREE.MeshLambertMaterial({
-  map: new THREE.TextureLoader().load( '../img/asphalt.jpg' ),
+  map: new THREE.TextureLoader().load( 'js/img/asphalt.jpg' ),
   //shadowSide: THREE.DoubleSide
 });
 const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
@@ -83,7 +83,7 @@ let kart;
 const GLTFLoader = new THREE.GLTFLoader();
 
 // Kart
-GLTFLoader.load('../models/kart.glb',
+GLTFLoader.load('js/models/kart.glb',
   function ( gltf ) {
     gltf.scene.children[8].material = new THREE.MeshLambertMaterial( {
       envMap: cubeCamera.renderTarget.texture
@@ -221,5 +221,5 @@ renderer.setAnimationLoop(animate);
 * Initial camera *
 *****************/
 
-camera.position.set(2, 20, 2).multiplyScalar(2);
-camera.lookAt(0, 20, 0);
+camera.position.set(1, 1, 1).multiplyScalar(90);
+camera.lookAt(0, 0, 0);

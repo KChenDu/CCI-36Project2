@@ -15,6 +15,14 @@ Foi usada para fitar os pontos de controle uma spline catmull-rom. A partir de u
 
 Como o modelo de carrinho que o grupo escolheu foi um kart, decidimos substituir os trilhos da montanha russa por uma pista de corrida; o resultado ficou semelhante a uma pista da hot wheels.
 
+## Inlucsão da mapa do ambiente ##
+
+A mapa da ambiente deste trabalho é composto por duas partes. A primeira é a mapa ambiental (enviroment map) feito de uma imagem celeste e a segunda de um piso implementado usando plane geometry do THREE.js. Para tornar a cena mais realista, colocou-se em adição uma textura asfalto para o piso.
+
+## Uso de texturas e sombreamentos ##
+
+Com relação à textura, além da prática já feita no item anterior para o piso. Fez se também uma textura metálica para os turbos do kart. Basicamente, a ideia é utilizar 
+
 [Examples](https://threejs.org/examples/) &mdash;
 [Documentation](https://threejs.org/docs/) &mdash;
 [Wiki](https://github.com/mrdoob/three.js/wiki) &mdash;
